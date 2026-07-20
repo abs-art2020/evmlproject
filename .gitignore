@@ -1,5 +1,5 @@
 # ---- Data Lakehouse Storage (NEVER UPLOAD TO GITHUB) ----
-data/
+data/*
 !data/3_gold/
 !data/3_gold/ev_warehouse_gold.duckdb
 !data/3_gold/market_predictions.duckdb
