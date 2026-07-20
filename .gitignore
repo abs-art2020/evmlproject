@@ -1,0 +1,35 @@
+# ---- Data Lakehouse Storage (NEVER UPLOAD TO GITHUB) ----
+data/
+!data/3_gold/
+!data/3_gold/ev_warehouse_gold.duckdb
+!data/3_gold/market_predictions.duckdb
+
+# ---- Local Python Virtual Environments ----
+ev_env/
+venv/
+.venv/
+env/
+
+# ---- Python Cache and Bytecode ----
+_pycache_/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ---- IDE and Editor Configs ----
+.vscode/
+.idea/
+*.suo
+.ntvs
+*.njsproj
+*.sln
+*.swp
+
+# ---- OS Generated Files ----
+.DS_Store
+Thumbs.db
+
+# ---- MLflow Local Storage outputs ----
+mlruns/
+mlflow_artifacts/
