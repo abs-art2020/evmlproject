@@ -1,0 +1,24 @@
+# ---- Core Data Engineering & Compute Layer ----
+pyspark==3.5.1
+pandas==2.2.2
+numpy==1.26.4
+duckdb==1.1.3
+
+# ---- Machine Learning (Classification & Regression) ----
+scikit-learn==1.5.0
+scipy==1.13.0
+
+# ---- MLOps & Experiment Tracking Server ----
+mlflow==2.13.0
+
+# ---- Model Deployment & Live Web API ----
+streamlit
+python-dotenv
+flask==3.0.3
+gunicorn==22.0.0
+requests==2.32.2
+
+# ---- Development Workspace & Testing Tools ----
+notebook==7.2.0
+openpyxl==3.1.2
+ipykernel==6.29.4
