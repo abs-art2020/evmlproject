@@ -12,16 +12,11 @@ netstat -ano | findstr :5000 >nul
 if %errorlevel% equ 0 (
     echo [OK] MLflow server is already online on port 5000.
 ) else (
-    :: Explicitly force Windows to launch the script inside its exact current directory
     start "MLflow Background Server" /d "%~dp0" cmd /c start_mlflow.bat
-    :: Give the local server 5 seconds to wake up and initialize sqlite
     timeout /t 5 /nobreak >nul
 
     echo [BROWSER] Opening MLflow Dashboard automatically...
-    :: This CLI command launches your default Windows browser straight to the UI
     start http://127.0.0.1:5000
-    
-    :: Wait another 2 seconds to make sure everything settles before running scripts
     timeout /t 2 /nobreak >nul
 )
 
@@ -81,12 +76,27 @@ echo ---------------------------------------------------
 echo ===================================================
 echo ALL PIPELINE STAGES COMPLETED SUCCESSFULLY!
 echo ===================================================
+
+echo.
+echo ===================================================
+echo [AUTOMATION] SYNCING FRESH DATA TO GITHUB...
+echo ===================================================
+cd /d "%~dp0"
+git checkout dev
+git pull origin dev --no-rebase
+git add -f data/3_gold/market_predictions.duckdb mlflow.db
+git commit -m "Automated local data refresh [skip ci]"
+git push origin dev
+
+echo ===================================================
+echo PIPELINE COMPLETED AND DATA SYNCED SUCCESSFULLY!
+echo ===================================================
 pause
 exit /b 0
 
 :error
 echo ===================================================
-echo PIPELINE ABORTED DUE TO AN ERROR. CHECK LOGS ABOVE.
+echo PIPELINE ABORTED DUE TO AN ERROR. DATA NOT SYNCED.
 echo ===================================================
 pause
 exit /b %errorlevel%
