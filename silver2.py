@@ -16,8 +16,8 @@ def get_spark_session(app_name):
         .master("local[*]") \
         .config("spark.sql.shuffle.partitions", "50") \
         .config("spark.jars.packages", "com.crealytics:spark-excel_2.12:3.5.1_0.20.4") \
-        .config("spark.driver.memory", "3g") \
-        .config("spark.executor.memory", "3g") \
+        .config("spark.driver.memory", "6g") \
+        .config("spark.executor.memory", "6g") \
         .config("spark.network.timeout", "36000s") \
         .config("spark.executor.heartbeatInterval", "300s") \
         .config("spark.sql.execution.arrow.maxRecordsPerBatch", "5000") \
@@ -125,86 +125,8 @@ def process_silver_layer():
     else:
         master_spark_df = None
         print("⚠️ No matching Excel assets located.")
-
-#     spark = get_spark_session("vahan_silver_pipeline")
-
-#     IS_DOCKER = os.path.exists('/.dockerenv') or os.environ.get('AIRFLOW_HOME') is not None
-
-# # 2. Compute the correct root directory dynamically
-#     if IS_DOCKER:
-#     # Inside Docker, everything sits right inside the opt path
-#       base_dir = "/opt/airflow"
-#     else:
-#     # On Windows, your code uses the parent file layout structure
-#       base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "EVMLProject"))
-#     #base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-#     bronze_path = os.path.join(base_dir, "data", "1_bronze","States")
-#     spark_dfs = []
-#    # silver_path = os.path.join(base_dir, "2_silver").replace("\\", "/")
-#     print("Bronze path isbeing printed",bronze_path)
-#     for root, dirs, files in os.walk(bronze_path):
-#         for f in files:
-#            if f.endswith(".xlsx"):
-#             state_name = os.path.basename(root)
-#             full_path = os.path.join(root, f)
-#             year_val = "Unknown"
-#             for y in ["2022", "2023", "2024", "2025", "2026","21","22","23","24","25","26"]:
-#                 if y in f:
-#                     year_val = y
-#                     break
-            
-#             try:
-#                 # Load Excel file cleanly using the Crealytics connector
-#                 df_file = spark.read.format("com.crealytics.spark.excel") \
-#                     .option("header", "true") \
-#                     .option("dataAddress", "0!A4") \
-#                     .load(full_path)
-#                 all_cols = df_file.columns
-
-# # 3. Apply transformations and custom names
-#                 df_file = df_file.select(
-#     # Rename _c0 to SlNo (Kept as string)
-#                                F.col(all_cols[0]).alias("SlNo"),
-    
-#     # Rename _c1 to whatever you want (e.g., "Description" or keep original)
-#                                F.trim(F.lcase(F.col(all_cols[1]))).alias("District"),
-    
-#     # Cast positions 2 up to 37 to Integers (keeps their original names)
-#                                   *[
-#         # Trim spaces -> Cast to float (to catch "0.0") -> Cast to int
-#         F.coalesce(
-#             F.trim(F.regexp_replace(F.col(all_cols[i]),",","")).cast("double").cast("int"), 
-#             F.lit(0) # Optional fallback: If it's still null, force it to 0
-#         ).alias(all_cols[i]) 
-#         for i in range(2, 38)
-#     ],
-    
-#     # Cast the last column to Integer and rename it to "Year" instead of _c38
-#                                F.regexp_replace(F.col(all_cols[38]),",","").cast("double").cast("int").alias("Total_Sales")
-# )
-#                 df_file = df_file.withColumn("state", F.lcase(F.lit(state_name))) \
-#                                  .withColumn("data_year",
-#                                   F.when(F.length(F.lit(year_val)) == 2, F.concat(F.lit("20"), F.lit(year_val)))
-#                                                 .otherwise(F.lit(year_val))) \
-#                                  .withColumn("source_file", F.lit(f)
-#                                  )
-#                 df_file = df_file.dropna(how="all", subset=["SlNo", "District"])
-#                 spark_dfs.append(df_file)
-#                 #display(df_file.select('*').filter(''' state in ('Chandigarh','Andaman')''').limit(5).toPandas())
-#             except Exception as e:
-#                 print(f"❌ Error loading file {f}: {e}")
-#     # len(spark_dfs)            
-#     if spark_dfs:
-#         master_spark_df = spark_dfs[0]
-#         for next_df in spark_dfs[1:]:
-#             master_spark_df = master_spark_df.unionByName(next_df, allowMissingColumns=True)
-#         print(f"✔️ Combined {len(spark_dfs)} Excel files successfully!")
-#     else:
-#         print("⚠️ No matching Excel assets located.")
-   #     print(f"✔️ Silver Processing Complete. Parquet storage built at: {output_vahan_path}")
     silver_parquet_path = os.path.join(base_dir,"data", "2_silver", "vahan_master_parquet")
     ## update on 10-7-2026
-    #silver_parquet_path = os.path.join(base_dir, "EVMLProject","data", "2_silver", "vahan_master_parquet")
 
     try:
         print("💾 Commencing Parquet write operations...")

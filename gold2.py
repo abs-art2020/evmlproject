@@ -56,9 +56,6 @@ def core_cleaning_preaggretion_and_gold_layer_creation():
         F.sum("Total_Charging_Stations_Built").alias("total_charging_stations_built_district_level"),
         F.sum("sum_total_conn").alias("sum_total_conn_d_level")
     )
-    #print("df_charging_district_agg print")
-    #df_charging_district_agg.show(5)
-# Establish a historical time window partitioned by area to calculate growth velocities
     keywords = ["rto", "uo", "rta"]
    
     word_pattern = r"(?i)\b(" + "|".join(keywords) + r")\b"
@@ -85,7 +82,6 @@ def core_cleaning_preaggretion_and_gold_layer_creation():
     df_vahan_with_lag = df_vahan_staged \
     .withColumn("prev_total_sales", F.lag("total_sales", 1).over(district_time_window)) \
     .withColumn("prev_ev_sales", F.lag("ev_sales", 1).over(district_time_window))
-    #print("df vahan with lag print")
     #df_vahan_with_lag.filter(F.col('v_district') == 'madurantagam uo' ).show(5)
 # Derive mathematically safe YoY percentage growth rates and target classifications
     df_vahan_intermediate = df_vahan_with_lag \
@@ -109,7 +105,7 @@ def core_cleaning_preaggretion_and_gold_layer_creation():
             END
         """)) \
         .withColumn("unique_district", F.concat_ws("_", F.lower(F.col("v_state")), F.lower(F.col("v_district"))))
-    district_window = (
+    unique_district_window_II = (
     Window.partitionBy("unique_district")
     .orderBy("data_year")
     .rowsBetween(Window.unboundedPreceding, -1)
@@ -118,7 +114,7 @@ def core_cleaning_preaggretion_and_gold_layer_creation():
     
     
     df_vahan_metrics = (df_vahan_metrics_intermediate.withColumn("state_ev_avg_pct", F.avg(F.when(F.col('data_year') <= 2025, F.col('ev_share_pct'))).over(state_window))
-                        .withColumn("district_encoded",F.coalesce(F.avg(F.col('ev_share_pct')).over(district_window),F.col('state_ev_avg_pct'))) )
+                        .withColumn("district_encoded",F.coalesce(F.avg(F.col('ev_share_pct')).over(unique_district_window_II),F.col('state_ev_avg_pct'))) )
     #df_vahan_metrics.filter(F.col('v_district') == 'madurantagam uo' ).show(5)
 # ==========================================
 # 1. GOLD TABLE: HISTORICAL TRAINING DATA (2021-2025)

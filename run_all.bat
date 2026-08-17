@@ -46,14 +46,14 @@ if %errorlevel% neq 0 (
 echo [SUCCESS] Bronze layer finished.
 echo ---------------------------------------------------
 
-@REM echo [RUN] Processing Silver Layer...
-@REM python silver2.py
-@REM if %errorlevel% neq 0 (
-@REM     echo [FAIL] Silver layer execution failed!
-@REM     goto :error
-@REM )
-@REM echo [SUCCESS] Silver layer finished.
-@REM echo ---------------------------------------------------
+echo [RUN] Processing Silver Layer...
+python silver2.py
+if %errorlevel% neq 0 (
+     echo [FAIL] Silver layer execution failed!
+     goto :error
+ )
+echo [SUCCESS] Silver layer finished.
+echo ---------------------------------------------------
 
 echo [RUN] Processing Gold Layer...
 python gold2.py
